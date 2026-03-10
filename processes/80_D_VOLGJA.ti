@@ -1,0 +1,12 @@
+#region Prolog
+
+
+
+#endregion
+#region Data
+
+
+CellPutN ( vSTICHTAGSKREDVOL_PER_GJ_ANFANG , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'Stichtagskreditvolumen_per_GJ_Anfang');
+
+
+#endregion

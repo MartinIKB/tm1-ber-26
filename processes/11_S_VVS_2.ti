@@ -1,0 +1,46 @@
+#region Prolog
+
+SubsetCreatebyMDX( 'sVertrieb', '{TM1FILTERBYPATTERN(TM1SUBSETALL([Vertrieb].[Vertrieb]) , "A_*" , "MEMBER_NAME")}', 1 );
+
+# Ermittlung Anzahl der Elemente in den Subsets
+vAnzahlSubsetVertrieb=SubsetGetSize( 'Vertrieb','sVertrieb' );
+iZählerVertrieb=0;
+
+# Loop über Anzahl Vertriebselemente im Subset
+while (iZählerVertrieb<vAnzahlSubsetVertrieb); 
+    iZählerVertrieb=iZählerVertrieb+1;
+
+   # Ermittlung der Elementnamen in den Subsets     
+   vVertrieb=SubsetGetElementName( 'Vertrieb', 'sVertrieb',iZählerVertrieb );
+
+   DimensionElementDelete( 'Vertrieb', vVertrieb );
+
+end;
+
+DimensionElementDelete( 'Vertrieb', 'Vertrieb' );
+DimensionElementInsert( 'Vertrieb','', 'Vertrieb', 'C' );
+
+
+   
+
+
+#endregion
+#region Metadata
+if (vChild@<>'Vertrieb');
+
+  DimensionElementInsert( 'Vertrieb', '', vParent, vSType );
+  DimensionElementInsert( 'Vertrieb', '', vChild, vSType );
+  
+  DimensionElementComponentAddDirect ('Vertrieb' , vPARENT ,  vChild, stringtonumber(vKonsolidierungsfaktor));
+
+endif;
+
+
+
+#endregion
+#region Data
+
+AttrPuts (vAlias , 'Vertrieb' , vChild , 'Caption');
+AttrPutS( vAttribut1, 'Vertrieb', vChild, 'Typ' );
+
+#endregion

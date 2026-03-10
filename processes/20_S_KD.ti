@@ -1,0 +1,25 @@
+#region Prolog
+
+
+#endregion
+#region Metadata
+if (DimensionElementExists( 'Vertrieb', vKD_NR )=0);
+   DimensionElementInsertDirect( 'Vertrieb','', vKD_NR, 'C' );
+endif;
+
+Parent=ELPAR( 'Vertrieb', vKD_NR,1);
+
+if (ELPAR( 'Vertrieb', vKD_NR,1)@<>'');
+ DimensionElementComponentDeleteDirect( 'Vertrieb',Parent, vKD_NR );
+endif; 
+
+DimensionElementComponentAddDirect ('Vertrieb' ,vVVS ,  vKD_NR, 1);
+#endregion
+#region Data
+AttrPuts (vAlias , 'Vertrieb' , vKD_NR , 'Caption');
+AttrPutS( vUDA, 'Vertrieb', vKD_NR, 'Typ' ); 
+AttrPutS( vKD_NR, 'Vertrieb', vKD_NR, 'KD_NR' ); 
+#endregion
+#region Epilog
+
+#endregion

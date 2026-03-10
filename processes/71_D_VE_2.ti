@@ -1,0 +1,70 @@
+#region Prolog
+
+
+#endregion
+#region Data
+
+CellIncrementN ( vPRV_1211AVP , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'1211AVP'  );
+CellIncrementN ( vPRV_1212KSP , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'1212KSP'  );
+CellIncrementN ( vPRV_1213KGP , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'1213KGP'  );
+CellIncrementN ( vPRV_1214AWF , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'1214AWF'  );
+CellIncrementN ( vPRV_1215BEP , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'1215BEP'  );
+CellIncrementN ( vPRV_12161VGTK , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'12161VGTK'  );
+CellIncrementN ( vPRV_12162VPR , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'12162VPR'  );
+CellIncrementN ( vPRV_12163VPR , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'12163VPR'  );
+CellIncrementN ( vPRV_12164AKE , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'12164AKE'  );
+CellIncrementN ( vPRV_12165EFF , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'12165EFF'  );
+CellIncrementN ( vPRV_121662PEA , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'121662PEA'  );
+CellIncrementN ( vPRV_121661DBG , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'121661DBG'  );
+CellIncrementN ( vPRV_1217SON , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'1217SON'  );
+CellIncrementN ( vPRV_1218KOV , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'1218KOV'  );
+CellIncrementN ( vSZUE_1311BPR , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'1311BPR'  );
+CellIncrementN ( vSZUE_1312KBP , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'1312KBP'  );
+CellIncrementN ( vSZUE_1313EVF , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'1313EVF'  );
+CellIncrementN ( vSZUE_1314CLO , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'1314CLO'  );
+CellIncrementN ( vPRV_AUFWAND , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'Provisionsaufwand'  );
+CellIncrementN ( vPRV_ERTRAG , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'Provisionsertrag'  );
+CellIncrementN ( vSZUE_AUFWAND , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'sonstiger_ZUE_Aufwand'  );
+CellIncrementN ( vSZUE_ERTRAG , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'sonstiger_ZUE_Ertrag'  );
+
+
+CellPutN ( vPRV_1211AVP+vPRV_1214AWF+vPRV_12161VGTK+vPRV_12165EFF
+          +vPRV_121662PEA+vPRV_121661DBG+vPRV_1217SON+vPRV_1218KOV , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'Provisionsueberschuss_Bestand'  );
+
+CellPutN ( vSZUE_1311BPR+vSZUE_1313EVF+vSZUE_1314CLO , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'sonstiger_ZUE_Bestand'  );
+
+
+CellPutN (  vSZUE_1312KBP, 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'sonstiger_ZUE_Neugeschaeft'  );
+
+CellPutN (vPRV_1212KSP+vSZUE_1311BPR+ vSZUE_1312KBP , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'Provisionsueberschuss_Vertriebsreporting'  );
+
+CellPutN (vPRV_1212KSP+ vSZUE_1312KBP+vPRV_12162VPR+vPRV_1215BEP , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'Provisionsueberschuss_NVR'  );
+
+##### Textwerte einladen  #####
+#CellPuts ( vVVS , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'VVS'  );
+CellPuts ( vPVS , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'PVS'  );
+CellPutS ( vAKS , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'AKS'  );
+CellPutS ( vBETREUUNGS_SEGMENT , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'BETREUUNGS_SEGMENT'  );
+CellPutS ( vKBEZ , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'KBEZ'  );
+CellPutS ( vENGA_RISIKO_KZ , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'ENGA_RISIKO_KZ'  );
+CellPutS ( vENGA_ZUORD_KZ , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'ENGA_ZUORD_KZ'  );
+CellPutS ( vRISIKO_MT_NR , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'RISIKO_MT_NR'  );
+CellPutS ( vAVS , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'AVS'  );
+
+
+###### Textwerte als Attribute hinzufügen #########
+if (ATTRS('Vertrieb', ElementParent( 'Vertrieb', 'Vertrieb', vVERTRIEB, 1 ),'Typ')@='Vertragsstamm');
+  vVertrieb_Level_VS=ElementParent( 'Vertrieb', 'Vertrieb', vVERTRIEB, 1 );
+endif;
+if (ATTRS('Vertrieb', ElementParent( 'Vertrieb', 'Vertrieb', vVertrieb_Level_VS, 1 ),'Typ')@='Kunde');
+  vVertrieb_Level_KD=ElementParent( 'Vertrieb', 'Vertrieb', vVertrieb_Level_VS, 1 );
+Endif;
+
+if (vVVS@<>'');
+  AttrPutS( vVVS, 'Vertrieb', vVertrieb, 'VVS', '' );
+  AttrPutS( vVVS, 'Vertrieb',vVertrieb_Level_VS,'VVS', '' );
+  AttrPutS( vVVS, 'Vertrieb',vVertrieb_Level_KD,'VVS', '' );
+endif;
+
+
+#endregion

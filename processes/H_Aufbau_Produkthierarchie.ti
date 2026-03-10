@@ -1,0 +1,45 @@
+#region Prolog
+#****Begin: Generated Statements***
+#****End: Generated Statements****
+
+
+IF ( DimensionExists ('Produkte')=0);
+   DimensionCreate ('Produkte');
+ENDIF;
+
+DimensionDeleteAllElements ('Produkte');
+
+
+DimensionElementInsert ('Produkte','','Produkte','C');
+
+AttrInsert ('Produkte' , '' , 'Caption' , 'A');
+
+#endregion
+#region Metadata
+
+#****Begin: Generated Statements***
+#****End: Generated Statements****
+
+DimensionElementInsert ('Produkte','',vParent,'C');
+DimensionElementInsert ('Produkte','',vChild,'N');
+
+
+DimensionElementComponentAdd ('Produkte' , vParent , vChild , 1);
+
+#endregion
+#region Data
+
+#****Begin: Generated Statements***
+#****End: Generated Statements****
+
+
+AttrPuts (vAlias , 'Produkte' , vChild , 'Caption');
+
+#endregion
+#region Epilog
+
+#****Begin: Generated Statements***
+#****End: Generated Statements****
+
+#ExecuteProcess ( 'Aufbau_Kunden_Ralf');
+#endregion

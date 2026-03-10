@@ -1,0 +1,24 @@
+{
+	"@type":"Hierarchy",
+	"Name":"ZZ_Hilfsdaten",
+	"Elements":
+	[
+		{
+			"Name":"ZZ_Hilfsdaten",
+			"Type":"Consolidated"
+		},
+		{
+			"Name":"Monatsfaktor",
+			"Type":"Numeric"
+		}
+	],
+	"Edges":
+	[
+		{
+			"ParentName":"ZZ_Hilfsdaten",
+			"ComponentName":"Monatsfaktor",
+			"Weight":0
+		}
+	],
+	"Subsets@Code.links":[]
+}

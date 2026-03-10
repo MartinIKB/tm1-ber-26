@@ -1,0 +1,11 @@
+#region Data
+
+if (CellIsUpdateable ('BER', vVertrieb, vProdukte, 'Jan_26', 'Ist_EUR', 'Test',vKennzahlen)=1);
+    IF( VALUE_IS_STRING = 1 );
+        CellPutS(SValue,'BER', vVertrieb, vProdukte, 'Jan_26', 'Ist_EUR', 'Test',vKennzahlen);
+    ELSE; 
+        CellPutN(NValue,'BER', vVertrieb, vProdukte, 'Jan_26', 'Ist_EUR', 'Test',vKennzahlen);  
+    ENDIF;
+endif;
+
+#endregion

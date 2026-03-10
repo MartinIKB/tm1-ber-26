@@ -1,0 +1,41 @@
+{
+	"@type":"Process",
+	"Name":"60_S_PVS",
+	"HasSecurityAccess":false,
+	"Code@Code.link":"60_S_PVS.ti",
+	"UIData":"_ParameterConstraints=e30=€",
+	"VariablesUIData":
+	[
+		"VarType=32€ColType=827€",
+		"VarType=32€ColType=827€",
+		"IgnoredInputVarName=V3€VarType=32€ColType=1165€"
+	],
+	"DataSource":
+	{
+		"Type":"ODBC",
+		"dataSourceNameForClient":"co1",
+		"dataSourceNameForServer":"co1",
+		"password":"etF]6loSMRpZB0_zv_IQ84cZTE;=Kc`BDTKg:2RobGnYaiS?CSjc:0^P:>BzZcX?fsSoSP0oIaTUt67:HC[`Nu^8RX~@o=?BcjKd<FOL]8nQz0jeTXj:\\^SqOL59\\\\iAGYdtbPQ1yRn7UFwA@50[SuDInZS1wIEf73b_Ke3I@Zm`x3@zRElUKO[O8C33csnQ8BGnHWq",
+		"query":"select\r\ndistinct *\r\nfrom\r\n(\r\nselect\r\ncase\r\n  when instr(zielkostenstelle,'_CMD_UMLAGE') <> 0\r\n  then 'P_'||nvl(replace(substr(zielkostenstelle,1,length(zielkostenstelle)-11),'P_'),'REST')\r\n  else 'P_REST'\r\nend as PARENT,\r\nCASE\r\n WHEN substr(zielkostenstelle,1,2)='P_'\r\n THEN nvl(zielkostenstelle,'NA')\r\n ELSE 'P_'||nvl(zielkostenstelle,'NA')\r\nend as child,\r\n'N' as N\r\nfrom\r\ndtl_pv_kosten_rest\r\nwhere\r\npv_kez='PVS' \r\nand monatsscheibe=(select monatsscheibe from pv_parameter)\r\n\r\nunion all\r\nselect distinct 'P_REST',\r\n'P_'||PVS16,\r\n'N'\r\nfrom dtl_br_vertrag\r\nwhere  monatsscheibe=(select monatsscheibe from pv_parameter)\r\n\r\nunion all\r\nselect distinct 'P_REST',\r\n'P_'||kostenstelle,\r\n'N'\r\nfrom dtl_br_provisionen_rest\r\nwhere  pv_kez='PVS'\r\nand monatsscheibe=(select monatsscheibe from pv_parameter)\r\n\r\nunion all\r\nselect distinct\r\nCASE \r\n  WHEN substr(produkt_zk,1,2)='P_'\r\n  THEN substr(produkt_zk,1,length(produkt_zk)-11)\r\n  ELSE 'P_'||substr(produkt_zk,1,length(produkt_zk)-11)\r\nend,\r\nCASE \r\n  WHEN substr(produkt_zk,1,2)='P_'\r\n  THEN produkt_zk\r\n  ELSE 'P_'||produkt_zk\r\nend,\r\n'N'\r\nfrom dtl_pv_kosten_cmd_umlage\r\nwhere monatsscheibe=(select monatsscheibe from pv_parameter)\r\n\r\nunion all\r\n\r\nselect \r\n'P_REST',\r\n'P_'||PVS,\r\n'N'\r\nfrom dtl_br_kunden_man_rest\r\nwhere monatsscheibe=(select monatsscheibe from pv_parameter)\r\n\r\nunion all\r\n\r\nselect \r\n'P_REST',\r\n'P_' || pvs_6,\r\n'N'\r\nfrom dtl_vr_auszahlungen\r\nwhere stichtag=(select last_day(to_date(monatsscheibe,'Mon_YY')) from pv_parameter)\r\n\r\norder by 2,1 ASC  \r\n)\r\norder by 2,1\r\n\r\n\r\n",
+		"userName":"f_prod_data",
+		"usesUnicode":true
+	},
+	"Parameters":[],
+	"Variables":
+	[
+		{
+			"Name":"vPARENT",
+			"Type":"String",
+			"Position":1,
+			"StartByte":0,
+			"EndByte":0
+		},
+		{
+			"Name":"vCHILD",
+			"Type":"String",
+			"Position":2,
+			"StartByte":0,
+			"EndByte":0
+		}
+	]
+}

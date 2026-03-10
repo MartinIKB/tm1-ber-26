@@ -1,0 +1,13 @@
+{
+	"@type":"Process",
+	"Name":"90_Export_STG_NVR_KD_VVS_BER",
+	"HasSecurityAccess":false,
+	"Code@Code.link":"90_Export_STG_NVR_KD_VVS_BER.ti",
+	"UIData":"_ParameterConstraints=e30=€",
+	"DataSource":
+	{
+		"Type":"None"
+	},
+	"Parameters":[],
+	"Variables":[]
+}

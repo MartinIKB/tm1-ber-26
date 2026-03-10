@@ -1,0 +1,11 @@
+{
+	"@type":"Process",
+	"Name":"10_Erstellung_Grunddaten_Zeilen",
+	"HasSecurityAccess":false,
+	"DataSource":
+	{
+		"Type":"None"
+	},
+	"Parameters":[],
+	"Variables":[]
+}

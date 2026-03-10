@@ -1,0 +1,28 @@
+#region Prolog
+
+
+#endregion
+#region Data
+
+CellPutN ( vCORPORATELAB_AVALPROVISION , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'Corporate_Lab_Avalprovisionen');
+CellPutN ( vEINGAENGE_ABGESCHR_FORDERUNGEN , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'Eingaenge_auf_abgeschriebene_Forderungen');
+CellPutN ( vEWB , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'EWB');
+CellPutN ( vFINANZANLAGEERGEBNIS , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'Finanzanlageergebnis');
+CellPutN ( vPOWB , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'PoWB');
+
+CellPutN ( vCORPORATELAB_AVALPROVISION , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'Provisionsueberschuss_Bestand'  );
+
+
+
+###### Textwerte als Attribute hinzufügen #########
+if (ATTRS('Vertrieb', ElementParent( 'Vertrieb', 'Vertrieb', vVERTRIEB, 1 ),'Typ')@='Vertragsstamm');
+  vVertrieb_Level_VS=ElementParent( 'Vertrieb', 'Vertrieb', vVERTRIEB, 1 );
+endif;
+if (ATTRS('Vertrieb', ElementParent( 'Vertrieb', 'Vertrieb', vVertrieb_Level_VS, 1 ),'Typ')@='Kunde');
+  vVertrieb_Level_KD=ElementParent( 'Vertrieb', 'Vertrieb', vVertrieb_Level_VS, 1 );
+Endif;
+AttrPutS( vVVS, 'Vertrieb', vVertrieb, 'VVS', '' );
+AttrPutS( vVVS, 'Vertrieb',vVertrieb_Level_VS,'VVS', '' );
+AttrPutS( vVVS, 'Vertrieb',vVertrieb_Level_KD,'VVS', '' );
+
+#endregion

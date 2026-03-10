@@ -1,0 +1,19 @@
+{
+	"@type":"Cube",
+	"Name":"ZZ_Monatsfaktor",
+	"Dimensions":
+	[
+		{
+			"@id":"Dimensions('Zeit')"
+		},
+		{
+			"@id":"Dimensions('ZZ_Hilfsdaten')"
+		}
+	],
+	"Rules@Code.link":"ZZ_Monatsfaktor.rules",
+	"MeasuresDimension":
+	{
+		"@id":"Dimensions('ZZ_Hilfsdaten')"
+	},
+	"Views@Code.links":[]
+}

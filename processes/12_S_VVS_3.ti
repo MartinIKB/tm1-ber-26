@@ -1,0 +1,19 @@
+#region Prolog
+
+
+#endregion
+#region Metadata
+
+if (DimensionElementExists( 'Vertrieb', vVVS )=0);
+   DimensionElementInsertDirect( 'Vertrieb','', vVVS, 'C' );
+   DimensionElementComponentAddDirect ('Vertrieb' , vPARENT ,  vVVS, 1);
+endif;
+
+
+#endregion
+#region Data
+AttrPuts (vName , 'Vertrieb' , vVVS , 'Caption'); 
+
+
+
+#endregion

@@ -1,0 +1,13 @@
+{
+	"@type":"Process",
+	"Name":"92_Export_OUT_BR_EUR_und_OUT_BR_MRG",
+	"HasSecurityAccess":false,
+	"Code@Code.link":"92_Export_OUT_BR_EUR_und_OUT_BR_MRG.ti",
+	"UIData":"_ParameterConstraints=e30=€",
+	"DataSource":
+	{
+		"Type":"None"
+	},
+	"Parameters":[],
+	"Variables":[]
+}

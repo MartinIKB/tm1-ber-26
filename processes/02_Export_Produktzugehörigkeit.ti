@@ -1,0 +1,36 @@
+#region Prolog
+ODBCOpen( 'co1','f_prod_data','access_prod' );
+ODBCOutput( 'co1','delete from stg_br_produktzugehoerigkeit where monatsscheibe in((select monatsscheibe from pv_parameter),(select to_char(last_day(to_date(monatsscheibe,''Mon_YY''))+1,''Mon_YY'') from pv_parameter))');  
+
+
+SubsetCreatebyMDX( 'sProdukte', '{TM1FILTERBYLEVEL(TM1SUBSETALL([Produkte].[Produkte]), 0)}', 1 );
+SubsetCreatebyMDX( 'sZeit', '{FILTER( {TM1SUBSETALL( [Zeit] )}, Instr([Zeit].[Flag_Aktueller_Monat], "Kalkulation") > 0 )}', 1 );
+
+vZeit=SubsetGetElementName( 'Zeit', 'sZeit',1 );
+
+# Ermittlung Anzahl der Elemente in den Subsets
+vAnzahlSubsetProdukte=SubsetGetSize( 'Produkte','sProdukte' );
+iZählerProdukte=0;
+
+# Loop über Anzahl Produkte auf Level 0 im Subset
+while (iZählerProdukte<vAnzahlSubsetProdukte); 
+    iZählerProdukte=iZählerProdukte+1;
+
+    vProdukte=SubsetGetElementName( 'Produkte', 'sProdukte', iZählerProdukte );
+    vProduktzugehoerigkeit=CellGetN( 'BER', 'Vertrieb',vProdukte ,vZeit , 'Ist_EUR', 'Entwicklung', 'Produktzugehörigkeit' );
+    vProd_Kat=NumberToString( vProduktzugehoerigkeit ); 
+    vProdukte_String=''''|vProdukte|''''; 
+
+# Schreiben in die Datenbank
+    if (vProduktzugehoerigkeit<>0)    ;
+        vSQL_Aktueller_Monat='insert into stg_br_produktzugehoerigkeit values ((select monatsscheibe from pv_parameter),'|vProdukte_String|','|vProd_Kat|',sysdate)';
+        vSQL_Folgemonat='insert into stg_br_produktzugehoerigkeit values ((select to_char(last_day(to_date(monatsscheibe,''Mon_YY''))+1,''Mon_YY'') from pv_parameter),'|vProdukte_String|','|vProd_Kat|',sysdate)';
+        ODBCOutput( 'co1', vSQL_Aktueller_Monat );
+        ODBCOutput( 'co1', vSQL_Folgemonat );
+    endif;   
+
+end;   
+#endregion
+#region Epilog
+ODBCClose( 'co1' );  
+#endregion

@@ -1,0 +1,20 @@
+#region Metadata
+
+
+if (DimensionElementExists( 'Zeit', vMONATSSCHEIBE )=0);
+   DimensionElementInsert( 'Zeit','', vMONATSSCHEIBE, 'N' );
+
+
+
+ DimensionElementComponentAddDirect ('Zeit' , vPARENT ,  vMONATSSCHEIBE, 0);
+endif;
+#endregion
+#region Data
+ 
+
+AttrPutS( vALIAS, 'Zeit', vMONATSSCHEIBE, 'Caption' ); 
+AttrPutS( vUDA, 'Zeit', vMONATSSCHEIBE, 'Flag_Aktueller_Monat'  );
+#endregion
+#region Epilog
+ 
+#endregion

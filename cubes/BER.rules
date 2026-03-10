@@ -1,0 +1,232 @@
+FEEDSTRINGS;
+
+SKIPCHECK;
+
+
+['Provisionsueberschuss_Neugeschaeft']=['1212KSP']+['1213KGP']+['1215BEP']+['12162VPR']+['12164AKE'];
+['PRV_SZUE_Neugeschaeft']=['Provisionsueberschuss_Neugeschaeft']+['sonstiger_ZUE_Neugeschaeft'];
+['RWA_QUOTE_STICHTAG']=['Stichtagsrisikoaktiva_per_dato']/['Stichtagskreditvolumen_per_dato'];
+['RWA_QUOTE_STICHTAG_KSA']=['Stichtagsrisikoaktiva_per_dato_KSA']/['Stichtagskreditvolumen_per_dato'];
+['plan_ausserplanmaessige_Tilgungen']=['Stichtagskreditvolumen_per_dato']-['Stichtagskreditvolumen_per_GJ_Anfang']-['Neugeschaeft']-['Bestandsveraenderung_Revolver'];
+
+
+###### Produktzugehörigkeit ########
+['Produktzugehörigkeit']=IF(ELISANC('Produkte','P_261099GR',!Produkte)=1
+                           & ELLEV('Produkte',!Produkte)=0
+,1
+,IF(ELISANC('Produkte','P_262099GR',!Produkte)=1
+ & ELLEV('Produkte',!Produkte)=0
+,2
+,IF(ELISANC('Produkte','P_262000_Übernahmefinanzierung',!Produkte)=1
+ & ELLEV('Produkte',!Produkte)=0
+,3
+,IF(ELISANC('Produkte','P_290273_MA',!Produkte)=1
+ & ELLEV('Produkte',!Produkte)=0
+,4
+,0))));
+
+
+###### Berechnung der P_NVR_NEU Positionen ##########
+['P_NVR_EIGENMITTEL']=['P_262000_Standard_Corporates']-['P_262022']+['P_262000_Projektfinanzierung']+['P_262000_Konsortialfinanzierung']-['P_220290']; 
+['P_NVR_FOERDERMITTEL']=['P_261099GR']-['P_261013']+['P_261013'];
+['P_NVR_IMMO_EIGEN']=['P_262000_Immobilienfinanzierung_Eigenmittel'];
+['P_NVR_IMMO_FOERDER']=['P_261011']+['P_261012'];
+['P_NVR_SLF']=if (ELISANC( 'Vertrieb', 'A_220300',!Vertrieb )<>0,['P_262000_Übernahmefinanzierung']-['P_262040'],['P_262000_Übernahmefinanzierung']);
+['P_NVR_M_A']=['P_BP1_MA'];
+['P_NVR_ASSET_FUND_MANAGEMENT']=['P_FM_LONDON'] + ['P_268099GR'];
+['P_NVR_TRADE_FINANCE']=['P_262000_Trade_Finance']+['P_262022'];
+['P_NVR_ASSET_BASED_LENDING']=['P_262000_Asset_Based_Lending'];
+['P_NVR_T3']=if (ELISANC( 'Vertrieb', 'A_220300',!Vertrieb )<>0,['P_262040'],0);
+['P_NVR_220290']=['P_220290'];
+
+
+###### Ist_Marge #########
+['Ist_Marge']=if ((ELISANC('Kennzahlen','BER' , !Kennzahlen )=1
+                   % ELISANC('Kennzahlen','PRV_SZUE_Nachrichtliche_Kennzahlen' , !Kennzahlen )=1
+                   % !Kennzahlen @='Risikovorsorge_Kreditgeschaeft'
+                   % !Kennzahlen @='verdiente_Risikokosten')
+& !Kennzahlen @<> 'Zinsueberschuss_Eigenmittel'
+& !Kennzahlen @<> 'Zinsueberschuss_Foerdermittel' 
+& !Kennzahlen @<> 'Zinsaufwand_Eigenmittel'
+& !Kennzahlen @<> 'Zinsertrag_Eigenmittel'
+& !Kennzahlen @<> 'Zinsaufwand_Foerdermittel'
+& !Kennzahlen @<> 'Zinsertrag_Foerdermittel'
+& (['durchschn_Volumen_zinstragendes_Geschaeft_(Mio._EUR)','Ist_EUR']<-1
+  %
+  ['durchschn_Volumen_zinstragendes_Geschaeft_(Mio._EUR)','Ist_EUR']>1)
+
+,(['Ist_EUR']/['durchschn_Volumen_zinstragendes_Geschaeft_(Mio._EUR)','Ist_EUR'])/  DB('ZZ_Monatsfaktor',!Zeit,'Monatsfaktor')
+,
+if(!Kennzahlen@='Zinsueberschuss_Eigenmittel',
+   (['Ist_EUR']/['durch_Volumen_Eigenmittel','Ist_EUR'])/  DB('ZZ_Monatsfaktor',!Zeit,'Monatsfaktor')
+,
+if(!Kennzahlen@='Zinsueberschuss_Foerdermittel',
+   (['Ist_EUR']/['durch_Volumen_Foerdermittel','Ist_EUR'])/  DB('ZZ_Monatsfaktor',!Zeit,'Monatsfaktor'),0)));
+
+
+###### Ist_TEUR  ##########
+['Ist_TEUR']=if (!Kennzahlen @='RWA_QUOTE_STICHTAG'
+                 % ELISANC('Kennzahlen','Parameter' , !Kennzahlen )=1
+                 % ELISANC('Kennzahlen','Sonstige_Kennzahlen' , !Kennzahlen )=1
+,['Ist_EUR']
+,['Ist_EUR']/1000);
+
+
+######## Ermittlung der Hilfs_KEZ ##########
+['KEZ_RELEVANT']= if (ABS(['Deckungsbeitrag_III','Ist_EUR'])+ABS(['Risikovorsorge_Kreditgeschaeft','Ist_EUR'])
+                     +ABS(['verdiente_Risikokosten','Ist_EUR'])+ABS(['EK_Kosten_KUKA','Ist_EUR'])+ABS(['durchschn_Volumen_zinstragendes_Geschaeft_(Mio._EUR)','Ist_EUR'])
+                     +ABS(['Stichtagskreditvolumen_per_dato','Ist_EUR'])+ABS(['Stichtagskreditvolumen_per_GJ_Anfang','Ist_EUR'])
+                     +ABS(['Neugeschaeft','Ist_EUR'])+ABS(['Durchschn_Risikoaktiva_per_dato','Ist_EUR'])<>0
+                     ,1
+                     ,0);
+                     
+['KEZ_LEER']= if (ABS(['Deckungsbeitrag_III','Ist_EUR'])+ABS(['Risikovorsorge_Kreditgeschaeft','Ist_EUR'])
+                 +ABS(['verdiente_Risikokosten','Ist_EUR'])+ABS(['EK_Kosten_KUKA','Ist_EUR'])+ABS(['durchschn_Volumen_zinstragendes_Geschaeft_(Mio._EUR)','Ist_EUR'])
+                 +ABS(['Stichtagskreditvolumen_per_dato','Ist_EUR'])+ABS(['Stichtagskreditvolumen_per_GJ_Anfang','Ist_EUR'])
+                 +ABS(['Neugeschaeft','Ist_EUR'])+ABS(['Durchschn_Risikoaktiva_per_dato','Ist_EUR'])<>0
+                 %
+                 ABS(['Deckungsbeitrag_III','Ist_Marge'])+ABS(['Risikovorsorge_Kreditgeschaeft','Ist_Marge'])
+                 +ABS(['verdiente_Risikokosten','Ist_Marge'])+ABS(['EK_Kosten_KUKA','Ist_Marge'])+ABS(['durchschn_Volumen_zinstragendes_Geschaeft_(Mio._EUR)','Ist_Marge'])
+                 +ABS(['Stichtagskreditvolumen_per_dato','Ist_Marge'])+ABS(['Stichtagskreditvolumen_per_GJ_Anfang','Ist_Marge'])
+                 +ABS(['Neugeschaeft','Ist_Marge'])+ABS(['Durchschn_Risikoaktiva_per_dato','Ist_Marge'])<>0
+                 ,1
+                 ,0);
+                     
+['KEZ_LEER_PRV']=if (ABS(['Provisionsueberschuss_SONST_ZUE','Ist_EUR'])+ABS(['Provisionsueberschuss_SONST_ZUE','Ist_Marge'])<>0
+                 ,1
+                 ,0);
+
+                     
+####### Umwandlung Produktzugehörigkeit in Text #############                     
+['PRODUKTZUGEHOERIGKEIT_TEXT']=s:if (['Produktzugehörigkeit']=1,'Corporate_Foerdermittel',
+                               if (['Produktzugehörigkeit']=2,'Corporate_Eigenmittel',
+                               if (['Produktzugehörigkeit']=3,'Uebernahmefinanzierungen', 
+                               if (['Produktzugehörigkeit']=4,'Derivate',''))));                   
+
+
+####### Befüllen der Stringelemente (soweit benötigt) auf Kundenebene ##########
+['VVS']=s:if((SUBST(!Vertrieb,1,2)@='V_'
+         % ATTRS( 'Vertrieb',!Vertrieb,'Typ')@='Vertragsstamm'
+         % ATTRS( 'Vertrieb',!Vertrieb,'Typ')@='Kunde')
+          & ['KEZ_RELEVANT']=1
+        ,ATTRS( 'Vertrieb', !Vertrieb, 'VVS' ),STET);
+
+['KD_NR']=s:IF( ATTRS( 'Vertrieb',!Vertrieb,'Typ')@='Kunde'
+            & ['KEZ_RELEVANT']=1
+           ,ATTRS( 'Vertrieb', !Vertrieb, 'KD_NR')
+           ,IF (ATTRS( 'Vertrieb',!Vertrieb,'Typ')@='Vertragsstamm'
+            & ['KEZ_RELEVANT']=1
+           ,ATTRS( 'Vertrieb', ELPAR('Vertrieb',!Vertrieb,1), 'KD_NR')
+           ,if(SUBST(!Vertrieb,1,2)@='V_'
+            & ['KEZ_RELEVANT']=1
+           ,ATTRS( 'Vertrieb', ELPAR('Vertrieb',ELPAR('Vertrieb',!Vertrieb,1),1), 'KD_NR')
+           ,STET)));
+
+
+
+###### Übernahme der Stringwerte ########
+['Ist_TEUR']=S:DB('BER',!Vertrieb,!Produkte,!Zeit,'Ist_EUR',!Freigabe,!Kennzahlen);
+['Ist_Marge']=S:DB('BER',!Vertrieb,!Produkte,!Zeit,'Ist_EUR',!Freigabe,!Kennzahlen);
+['Version']=S:DB('BER',!Vertrieb,!Produkte,!Zeit,'Ist_EUR',!Freigabe,!Kennzahlen);
+
+
+####### Berechnung ÜBER-/Unterdeckung
+['Ueber_Unterdeckung']=['verdiente_Risikokosten']+['Risikovorsorge_Kreditgeschaeft'];
+
+
+####### Berechnung alternativer Deckungsbeiträge
+['Deckungsbeitrag_III_mit_aktuellen_Fundingkosten']=if (['Zinsmarge_mit_aktuellen_Fundingkosten']<>0,['Deckungsbeitrag_III']-['Zinsueberschuss']+['Zinsmarge_mit_aktuellen_Fundingkosten'],['Deckungsbeitrag_III']);
+['Deckungsbeitrag_III_Risikovorsorge']=['Deckungsbeitrag_III']-['Standardrisikokosten']+['Risikovorsorge_Kreditgeschaeft'];
+['Deckungsbeitrag_II_mit_aktuellen_Fundingkosten']=if (['Zinsmarge_mit_aktuellen_Fundingkosten']<>0,['Deckungsbeitrag_II']-['Zinsueberschuss']+['Zinsmarge_mit_aktuellen_Fundingkosten'],['Deckungsbeitrag_II']);
+['Deckungsbeitrag_II_Risikovorsorge']=['Deckungsbeitrag_II']-['Standardrisikokosten']+['Risikovorsorge_Kreditgeschaeft'];
+['Deckungsbeitrag_III_mit_aktuellen_Fundingkosten_nach_RV']=if (['Zinsmarge_mit_aktuellen_Fundingkosten']<>0,['Deckungsbeitrag_III']-['Zinsueberschuss']+['Zinsmarge_mit_aktuellen_Fundingkosten']-['Standardrisikokosten']+['Risikovorsorge_Kreditgeschaeft']
+                                                            , ['Deckungsbeitrag_III']);
+
+FEEDERS;
+['1212KSP']=>['Provisionsueberschuss_Neugeschaeft'];
+['1213KGP']=>['Provisionsueberschuss_Neugeschaeft'];
+['1215BEP']=>['Provisionsueberschuss_Neugeschaeft'];
+['12162VPR']=>['Provisionsueberschuss_Neugeschaeft'];
+['12164AKE']=>['Provisionsueberschuss_Neugeschaeft'];
+['Provisionsueberschuss_Neugeschaeft']=>['PRV_SZUE_Neugeschaeft'];
+['sonstiger_ZUE_Neugeschaeft']=>['PRV_SZUE_Neugeschaeft'];
+['Stichtagsrisikoaktiva_per_dato']=>['RWA_QUOTE_STICHTAG'];
+['Stichtagsrisikoaktiva_per_dato_KSA']=>['RWA_QUOTE_STICHTAG_KSA'];
+['Stichtagskreditvolumen_per_dato']=>['plan_ausserplanmaessige_Tilgungen'];
+['Stichtagskreditvolumen_per_GJ_Anfang']=>['plan_ausserplanmaessige_Tilgungen'];
+['Neugeschaeft']=>['plan_ausserplanmaessige_Tilgungen'];
+['Bestandsveraenderung_Revolver']=>['plan_ausserplanmaessige_Tilgungen'];
+
+
+
+##### Feeding der P_NVR Elemente, damit die Nullzeilen im Provisionsexport richtig unterdrückt werden ######
+['P_262000_Standard_Corporates']=>['P_NVR_EIGENMITTEL'];
+['P_262022']=>['P_NVR_EIGENMITTEL'];
+['P_262000_Projektfinanzierung']=>['P_NVR_EIGENMITTEL'];
+['P_262000_Konsortialfinanzierung']=>['P_NVR_EIGENMITTEL'];
+['P_220290']=>['P_NVR_EIGENMITTEL'];
+['P_261099GR']=>['P_NVR_FOERDERMITTEL'];
+['P_261013']=>['P_NVR_FOERDERMITTEL'];
+['P_262000_Immobilienfinanzierung_Eigenmittel']=>['P_NVR_IMMO_EIGEN'];
+['P_261011']=>['P_NVR_IMMO_FOERDER'];
+['P_261012']=>['P_NVR_IMMO_FOERDER'];
+['P_262000_Übernahmefinanzierung']=>['P_NVR_SLF'];
+['P_262040']=>['P_NVR_SLF'];
+['P_BP1_MA']=>['P_NVR_M_A'];
+['P_FM_LONDON']=>['P_NVR_ASSET_FUND_MANAGEMENT'];
+['P_268099GR']=>['P_NVR_ASSET_FUND_MANAGEMENT'];
+['P_262000_Trade_Finance']=>['P_NVR_TRADE_FINANCE'];
+['P_262022']=>['P_NVR_TRADE_FINANCE'];
+['P_262000_Asset_Based_Lending']=>['P_262000_Asset_Based_Lending'];
+['P_262040']=>['P_NVR_T3'];
+['P_220290']=>['P_NVR_220290'];
+
+
+##### Feeding für Versionselemente
+['Ist_EUR']=>['Ist_TEUR'];
+['Ist_EUR']=>['Ist_Marge'];
+
+
+#### Fedding weitere Kennzahlen
+['verdiente_Risikokosten']=>['Ueber_Unterdeckung'];
+['Risikovorsorge_Kreditgeschaeft']=>['Ueber_Unterdeckung'];
+
+
+#### Feeding für alternative Deckungsbeiträge
+
+['Zinsmarge_mit_aktuellen_Fundingkosten']=>['Deckungsbeitrag_III_mit_aktuellen_Fundingkosten'];
+['Deckungsbeitrag_III']=>['Deckungsbeitrag_III_mit_aktuellen_Fundingkosten']
+                        ,['Deckungsbeitrag_III_Risikovorsorge']
+                        ,['Deckungsbeitrag_III_mit_aktuellen_Fundingkosten_nach_RV'];
+['Standardrisikokosten']=>['Deckungsbeitrag_III_Risikovorsorge'];
+['Risikovorsorge_Kreditgeschaeft']=>['Deckungsbeitrag_II_Risikovorsorge']
+                                   ,['Deckungsbeitrag_III_Risikovorsorge'];
+['Zinsmarge_mit_aktuellen_Fundingkosten']=>['Deckungsbeitrag_II_mit_aktuellen_Fundingkosten']
+                                          ,['Deckungsbeitrag_III_mit_aktuellen_Fundingkosten_nach_RV'];
+['Deckungsbeitrag_II']=>['Deckungsbeitrag_II_mit_aktuellen_Fundingkosten']
+                       ,['Deckungsbeitrag_II_Risikovorsorge'];
+                       
+                       
+#####  Feeding der Hilfs-KEZ  #####
+['Deckungsbeitrag_III']=>['KEZ_LEER'];
+['verdiente_Risikokosten']=>['KEZ_LEER'];
+['EK_Kosten_KUKA']=>['KEZ_LEER'];
+['durchschn_Volumen_zinstragendes_Geschaeft_(Mio._EUR)']=>['KEZ_LEER'];
+['Stichtagskreditvolumen_per_dato']=>['KEZ_LEER'];
+['Stichtagskreditvolumen_per_GJ_Anfang']=>['KEZ_LEER'];
+['Neugeschaeft']=>['KEZ_LEER'];
+['Durchschn_Risikoaktiva_per_dato']=>['KEZ_LEER'];
+
+['Deckungsbeitrag_III']=>['KEZ_RELEVANT'];
+['verdiente_Risikokosten']=>['KEZ_RELEVANT'];
+['EK_Kosten_KUKA']=>['KEZ_RELEVANT'];
+['durchschn_Volumen_zinstragendes_Geschaeft_(Mio._EUR)']=>['KEZ_RELEVANT'];
+['Stichtagskreditvolumen_per_dato']=>['KEZ_RELEVANT'];
+['Stichtagskreditvolumen_per_GJ_Anfang']=>['KEZ_RELEVANT'];
+['Neugeschaeft']=>['KEZ_RELEVANT'];
+['Durchschn_Risikoaktiva_per_dato']=>['KEZ_RELEVANT'];
+
+['Provisionsueberschuss_SONST_ZUE']=>['KEZ_LEER_PRV'];
+
+
+

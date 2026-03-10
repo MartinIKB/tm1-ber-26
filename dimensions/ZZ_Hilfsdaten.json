@@ -1,0 +1,12 @@
+{
+	"@type":"Dimension",
+	"Name":"ZZ_Hilfsdaten",
+	"Hierarchies@Code.links":
+	[
+		"ZZ_Hilfsdaten.hierarchies/ZZ_Hilfsdaten.json"
+	],
+	"DefaultHierarchy":
+	{
+		"@id":"Dimensions('ZZ_Hilfsdaten')/Hierarchies('ZZ_Hilfsdaten')"
+	}
+}

@@ -1,0 +1,43 @@
+#region Prolog
+
+ODBCOpen( 'co1','f_prod_data','access_prod' );
+ODBCOutput( 'co1','delete from stg_nvr_kd_vvs_ber where monatsscheibe=(select monatsscheibe from pv_parameter)' );
+
+
+
+SubsetCreatebyMDX( 'sVertrieb', '{FILTER(TM1SubsetAll([Vertrieb].[Vertrieb]), (INSTR(1, [Vertrieb].[Vertrieb].CURRENTMEMBER.PROPERTIES("Typ"), "Kunde", 1) >= 1))}', 1 );
+SubsetCreatebyMDX( 'sZeit', '{FILTER( {TM1SUBSETALL( [Zeit] )}, Instr([Zeit].[Flag_Aktueller_Monat], "Kalkulation") > 0 )}', 1 );
+
+vZeit=SubsetGetElementName( 'Zeit', 'sZeit',1 );
+
+# Ermittlung Anzahl der Elemente in den Subsets
+vAnzahlSubsetVertrieb=SubsetGetSize( 'Vertrieb','sVertrieb' );
+iZählerVertrieb=0;
+
+# Loop über Anzahl Vertriebselemente im Subset
+while (iZählerVertrieb<vAnzahlSubsetVertrieb); 
+    iZählerVertrieb=iZählerVertrieb+1;
+
+   # Ermittlung der Elementnamen in den Subsets     
+   vVertrieb=SubsetGetElementName( 'Vertrieb', 'sVertrieb',iZählerVertrieb );
+
+
+   # Auslesen der Werte 
+   vVVS=CellGetS( 'BER', vVertrieb, 'Produkte', vZeit, 'Ist_EUR', 'Entwicklung', 'VVS' );
+
+    
+   # Ausfiltern von leeren VVS
+   if (vVVS@<>'');
+    
+     # Aufbau SQL String 
+     vSQL='insert into stg_nvr_kd_vvs_ber values('''|vZeit|''','''|vVertrieb|''','''|vVVS|''',sysdate)';
+    
+     # Ausführen SQL
+     ODBCOutput( 'co1',vSQL );
+   endif;
+   
+end;     
+#endregion
+#region Epilog
+ODBCClose( 'co1' );
+#endregion

@@ -1,0 +1,155 @@
+#region Prolog
+#****Begin: Generated Statements***
+#****End: Generated Statements****
+###### Cubes
+
+
+##### Dimensions
+
+##### Misc
+s_View_target = 'Load_Kennzahlen';
+s_Subset_target = s_View_target |'_Subset' ;
+
+
+# Create target
+
+ViewCreate ( 'BER' , s_View_target , 1);
+
+###### Subsets
+
+
+SubsetCreatebyMDX( s_Subset_target, '{FILTER( {TM1SUBSETALL( [Zeit] )}, Instr([Zeit].[Flag_Aktueller_Monat], "Kalkulation") > 0 )}', 1 );
+SubsetCreatebyMDX( 'sEntwicklung', '{[Freigabe].[Freigabe].[Entwicklung]}', 1 );
+
+ViewSubsetAssign ( 'BER' , s_View_target , 'Zeit' , s_Subset_target );
+ViewSubsetAssign ( 'BER' , s_View_target , 'Freigabe' , 'sEntwicklung' );
+
+ViewZeroOut ( 'BER' , s_View_target );
+
+
+##### Metadata ####
+#endregion
+#region Metadata
+ 
+#endregion
+#region Data
+
+
+
+##### Data ####
+CellPutN ( vFINANZANLAGERGEBNIS , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'Finanzanlageergebnis'  );
+CellPutN ( vPV_EL_STICHTAG_VA , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'Standardrisikokosten'  );
+CellPutN ( vEWB , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'EWB'  );
+CellPutN ( vPOWB , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'POWB'  );
+CellPutN ( vEINGAENGE_ABGESCHR_FORDERUNGEN , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'Eingaenge_auf_abgeschriebene_Forderungen'  );
+CellPutN ( vPV_RISIKOKOSTEN , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'verdiente_Risikokosten'  );
+CellPutN ( vPV_EK_KOSTEN , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'EK_Kosten_KUKA'  );
+CellPutN ( vPV_DURCH_KREDVOL , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'durchschn_Volumen_zinstragendes_Geschaeft_(Mio._EUR)'  );
+CellPutN ( vPV_ST_KRED_VOL_FOERDER , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'STICHTAGSKREDVOL FOERDERMITTEL'  );
+CellPutN ( vPV_ST_KRED_VOL_EIGEN , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'STICHTAGSKREDVOL_EIGENMITTEL'  );
+CellPutN ( vPV_RWA_IRB_FND_VA , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'Stichtagsrisikoaktiva_per_dato'  );
+CellPutN ( vPV_RWA_IRB_FND_VA_DURCH , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'Durchschn_Risikoaktiva_per_dato'  );
+CellPutN ( vPV_EK_KAPITAL_IRB , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'Eigenkapital'  );
+CellPutN ( vPV_DURCH_KREDVOL_FOERDER , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'durch_Volumen_Foerdermittel'  );
+CellPutN ( vPV_DURCH_KREDVOL_EIGEN , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'durch_Volumen_Eigenmittel'  );
+CellPutN ( vRWA_KSA_VA , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'Stichtagsrisikoaktiva_per_dato_KSA'  );
+CellPutN ( vRWA_KSA_DURCH_VA , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'Durchschn_Risikoaktiva_per_dato_KSA'  );
+CellPutN ( vCORPORATELAB_AVALPROVISION_VE , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'Corporate_Lab_Avalprovisionen'  );
+CellPutN ( vPV_RESTAUSZAHLUNG , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'Restauszahlungsvolumen'  );
+CellPutN ( vZINSUEBERSCHUSS_ZINSMARGE , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'Zinsmarge_mit_aktuellen_Fundingkosten'  );
+CellPutN ( vZINSUEBERSCHUSS_KUNDENMARGE , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'Zinsuberschuss_Kundenmarge'  );
+CellPutN ( vDISAGIO_ABGR_KREDITBEARB , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'Disagio_Abgrenzung_Kreditbearbeitungsprv'  );
+CellPutN ( vDISAGIO_ABGR_STRUKT , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'Disagio_Abgrenzung_Strukturierungsprv'  );
+CellPutN ( vPRV_1211AVP , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'1211AVP'  );
+CellPutN ( vPRV_1212KSP , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'1212KSP'  );
+CellPutN ( vPRV_1213KGP , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'1213KGP'  );
+CellPutN ( vPRV_1214AWF , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'1214AWF'  );
+CellPutN ( vPRV_1215BEP , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'1215BEP'  );
+CellPutN ( vPRV_12161VGTK , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'12161VGTK'  );
+CellPutN ( vPRV_12162VPR , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'12162VPR'  );
+CellPutN ( vPRV_12163VPR , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'12163VPR'  );
+CellPutN ( vPRV_12164AKE , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'12164AKE'  );
+CellPutN ( vPRV_12165EFF , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'12165EFF'  );
+CellPutN ( vPRV_121662PEA , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'121662PEA'  );
+CellPutN ( vPRV_121661DBG , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'121661DBG'  );
+CellPutN ( vPRV_1217SON , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'1217SON'  );
+CellPutN ( vPRV_1218KOV , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'1218KOV'  );
+CellPutN ( vSZUE_1311BPR , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'1311BPR'  );
+CellPutN ( vSZUE_1312KBP , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'1312KBP'  );
+CellPutN ( vSZUE_1313EVF , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'1313EVF'  );
+CellPutN ( vSZUE_1314CLO , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'1314CLO'  );
+CellPutN ( vPV_ZINSAUFW_SALDO_LFD_EIGEN , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'Zinsaufwand_Eigenmittel'  );
+CellPutN ( vPV_ZINSAUFW_SALDO_LFD_FREMD , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'Zinsaufwand_Foerdermittel'  );
+CellPutN ( vPV_ZINSERTR_SALDO_LFD_EIGEN , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'Zinsertrag_Eigenmittel'  );
+CellPutN ( vPV_ZINSERTR_SALDO_LFD_FREMD , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'Zinsertrag_Foerdermittel'  );
+CellPutN ( vPRV_AUFWAND , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'Provisionsaufwand'  );
+CellPutN ( vPRV_ERTRAG , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'Provisionsertrag'  );
+CellPutN ( vSZUE_AUFWAND , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'sonstiger_ZUE_Aufwand'  );
+CellPutN ( vSZUE_ERTRAG , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'sonstiger_ZUE_Ertrag'  );
+CellPutN ( vBESTANDSVERAENDERUNG_REVOLVER , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'Bestandsveraenderung_Revolver'  );
+CellPutN ( vKOSTEN_PRODUKT_1 , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'Kosten_1_Produkt'  );
+CellPutN ( vKOSTEN_PRODUKT_3 , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'Verwaltungskosten_Marktfolge'  );
+CellPutN ( vKOSTEN_PRODUKT_4 , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'Verwaltungskosten_Zentrale_Bereiche'  );
+CellPutN ( vKOSTEN_PRODUKT_5 , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'Verwaltungskosten_Zentrale_Umlage'  );
+CellPutN ( vKOSTEN_1_VERTRIEB , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'Kosten_Vertrieb'  );
+CellPutN ( vKOSTEN_1_INDUSTRIEGRUPPEN , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'Kosten_Industriegruppen'  );
+CellPutN ( vVorfaelligkeitsentschaedigungen_KD , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'Vorfaelligkeitsentschaedigungen_KD'  );
+
+CellPutN ( vCORPORATELAB_AVALPROVISION_VE+vPRV_1211AVP+vPRV_1214AWF+vPRV_12161VGTK+vPRV_12165EFF
+          +vPRV_121662PEA+vPRV_121661DBG+vPRV_1217SON+vPRV_1218KOV , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'Provisionsueberschuss_Bestand'  );
+
+CellPutN ( vSZUE_1311BPR+vSZUE_1313EVF+vSZUE_1314CLO , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'sonstiger_ZUE_Bestand'  );
+
+
+
+CellPutN (  vSZUE_1312KBP, 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'sonstiger_ZUE_Neugeschaeft'  );
+
+CellPutN (vPRV_1212KSP+vSZUE_1311BPR+ vSZUE_1312KBP , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'Provisionsueberschuss_Vertriebsreporting'  );
+
+CellPutN (vPRV_1212KSP+ vSZUE_1312KBP+vPRV_12162VPR+vPRV_1215BEP , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'Provisionsueberschuss_NVR'  );
+
+##### Textwerte einfügen   #######
+
+#CellPuts ( vVVS , 'BER_23' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'VVS'  );
+CellPuts ( vPVS , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'PVS'  );
+CellPuts ( vTYP , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'TYP'  );
+CellPuts ( vBUCHUNGSKREIS , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'Buchungskreis'  );
+CellPutS ( vBONITAET , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'Bonitaet'  );
+CellPuts ( vLFD_NR , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'LFD_NR'  );
+CellPuts ( vTranche , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'TRANCHE'  );
+CellPuts ( vUB_NR , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'UB_NR'  );
+CellPuts ( vUB_TYP_SCHL , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'UB_TYP_SCHL'  );
+CellPuts ( vAVS , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'AVS'  );
+CellPuts ( vKBEZ , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'KBEZ'  );
+CellPuts ( vAKS , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'AKS'  );
+CellPuts ( vSEGMENT , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'SEGMENT'  );
+CellPuts ( vBASEL_KONFORM_KZ , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'BASEL_KONFORM_KZ'  );
+CellPuts ( vBETREUUNGS_SEGMENT , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'BETREUUNGS_SEGMENT'  );
+CellPuts ( vENGA_RISIKO_KZ , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'ENGA_RISIKO_KZ'  );
+CellPuts ( vENGA_ZUORD_KZ , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'ENGA_ZUORD_KZ'  );
+CellPuts ( vRISIKO_MT_NR , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'RISIKO_MT_NR'  );
+CellPuts ( vHERMES_PROZ , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'HERMES_PROZ'  );
+CellPuts ( vWAEHR_CODE , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'WAEHR_CODE'  );
+CellPuts ( vKD_LAND_RISIKO , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'KD_LAND_RISIKO'  );
+CellPuts ( vCRM_PROJEKT_NUMMER , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'CRM_PROJEKT_NUMMER'  );
+CellPuts ( vKD_LAND , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'KD_LAND'  );
+CellPuts ( vFINANZIERUNGSART , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'FINANZIERUNGSART'  );
+CellPuts ( vSPARTE , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'SPARTE'  );
+CellPuts ( vVOG , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'VOG'  );
+CellPuts ( vTIER_MAX_VOG , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'TIER_MAX_VOG'  );
+CellPuts ( vUMSATZSEGMENT_MAX_VOG , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'UMSATZSEGMENT_MAX_VOG'  );
+
+
+###### Textwerte als Attribute hinzufügen #########
+if (ATTRS('Vertrieb', ElementParent( 'Vertrieb', 'Vertrieb', vVERTRIEB, 1 ),'Typ')@='Vertragsstamm');
+  vVertrieb_Level_VS=ElementParent( 'Vertrieb', 'Vertrieb', vVERTRIEB, 1 );
+endif;
+if (ATTRS('Vertrieb', ElementParent( 'Vertrieb', 'Vertrieb', vVertrieb_Level_VS, 1 ),'Typ')@='Kunde');
+  vVertrieb_Level_KD=ElementParent( 'Vertrieb', 'Vertrieb', vVertrieb_Level_VS, 1 );
+Endif;
+AttrPutS( vVVS, 'Vertrieb', vVertrieb, 'VVS', '' );
+AttrPutS( vVVS, 'Vertrieb',vVertrieb_Level_VS,'VVS', '' );
+AttrPutS( vVVS, 'Vertrieb',vVertrieb_Level_KD,'VVS', '' );
+
+
+#endregion

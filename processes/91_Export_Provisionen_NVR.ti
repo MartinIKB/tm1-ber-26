@@ -1,0 +1,69 @@
+#region Prolog
+ODBCOpen( 'co1', 'f_prod_data','access_prod' ); 
+# Löschen der Daten in STG_NVR_PROVISIONEN für Berichtsmonat
+ODBCOutput( 'co1','delete from stg_nvr_provisionen where monatsscheibe=(select monatsscheibe from pv_parameter)');  
+
+
+# Bildung Subset aller Vertriebselemente mit UDA=Kunde oder PRV
+SubsetCreatebyMDX( 'sVertrieb', '{FILTER(TM1SubsetAll([Vertrieb].[Vertrieb]), ([Vertrieb].[Vertrieb].CURRENTMEMBER.PROPERTIES("Typ") = "Kunde") OR ([Vertrieb].[Vertrieb].CURRENTMEMBER.PROPERTIES("Typ") = "PRV"))}', 1 );
+# Bildung Subset aller Elemente unterhalb von P_NVR_NEU
+SubsetCreatebyMDX( 'sProdukte', 'EXCEPT(DRILLDOWNMEMBER(DRILLUPMEMBER({[Produkte].[Produkte].[P_NVR_NEU]} , {[Produkte].[Produkte].[P_NVR_NEU]}) , {[Produkte].[Produkte].[P_NVR_NEU]} , RECURSIVE) , {[Produkte].[Produkte].[P_NVR_NEU]})',1);
+# Ermittlung aktueller Berichtsmonat
+SubsetCreatebyMDX( 'sZeit', '{FILTER( {TM1SUBSETALL( [Zeit] )}, Instr([Zeit].[Flag_Aktueller_Monat], "Kalkulation") > 0 )}', 1 );
+
+vZeit=SubsetGetElementName( 'Zeit', 'sZeit',1 );
+# Ermittlung Anzahl der Elemente in den Subsets
+vAnzahlSubsetVertrieb=SubsetGetSize( 'Vertrieb','sVertrieb' );
+vAnzahlSubsetProdukte=SubsetGetSize( 'Produkte', 'sProdukte' );
+
+iZählerVertrieb=0;
+
+# Loop über Anzahl Vertriebselemente im Subset
+while (iZählerVertrieb<vAnzahlSubsetVertrieb); 
+ iZählerVertrieb=iZählerVertrieb+1;
+ iZählerProdukte=0;
+    
+# Loop über Anzahl Produktelemente im Subset    
+ while (iZählerProdukte<vAnzahlSubsetProdukte)   ;
+     
+  iZählerProdukte=iZählerProdukte+1;
+     
+# Ermittlung der Elementnamen in den Subsets     
+  vVertrieb=SubsetGetElementName( 'Vertrieb', 'sVertrieb',iZählerVertrieb );
+  vProdukte=SubsetGetElementName( 'Produkte', 'sProdukte', iZählerProdukte );
+
+# Auslesen der Werte für die zu exportierenden Provisionsarten     
+  v1212KSP=CellGetN( 'BER', vVertrieb, vProdukte,vZeit,'Ist_EUR', 'Entwicklung', '1212KSP' );
+  v1312KBP=CellGetN( 'BER', vVertrieb, vProdukte,vZeit,'Ist_EUR', 'Entwicklung', '1312KBP' );
+  v12162VPR=CellGetN( 'BER', vVertrieb, vProdukte,vZeit,'Ist_EUR', 'Entwicklung', '12162VPR' );
+  v1215BEP=CellGetN( 'BER', vVertrieb, vProdukte,vZeit,'Ist_EUR', 'Entwicklung', '1215BEP' );
+  v1311BPR=CellGetN( 'BER', vVertrieb, vProdukte,vZeit,'Ist_EUR', 'Entwicklung', '1311BPR' );
+  vProvisionsueberschuss=CellGetN( 'BER', vVertrieb, vProdukte,vZeit,'Ist_EUR', 'Entwicklung', 'Provisionsueberschuss' );
+  vsonstiger_Zinsueberschuss=CellGetN( 'BER', vVertrieb, vProdukte,vZeit,'Ist_EUR', 'Entwicklung', 'sonstiger_Zinsueberschuss' );
+
+# Umwandeln der Werte in amerikanisches Format zum Einladen nach Oracle     
+  v1212KSP_String=NumberToStringEx( v1212KSP ,'#.0,###########','.','');
+  v1312KBP_String=NumberToStringEx( v1312KBP,'#.0,###########','.','' );
+  v12162VPR_String=NumberToStringEx( v12162VPR ,'#.0,###########','.','');
+  v1215BEP_String=NumberToStringEx( v1215BEP ,'#.0,###########','.','');
+  v1311BPR_String=NumberToStringEx( v1311BPR ,'#.0,###########','.','');
+  vProvisionsueberschuss_String=NumberToStringEx( vProvisionsueberschuss,'#.0,###########','.','' );
+  vsonstiger_Zinsueberschuss_String=NumberToStringEx( vsonstiger_Zinsueberschuss,'#.0,###########','.','' );
+
+# Aufbau SQL-String     
+  vSQL='insert into stg_nvr_provisionen values ('''|vZeit|''','''|vVertrieb|''','''|vProdukte|''','|v1212KSP_String|','|v1312KBP_String|','|v12162VPR_String|','|v1215BEP_String|','|v1311BPR_String|','|vProvisionsueberschuss_String|','|vsonstiger_Zinsueberschuss_String|',sysdate)'; 
+
+# Herausfiltern von Zeilen ohne Werte     
+  if (ABS(v1212KSP)+ABS(v1312KBP)+ABS(v12162VPR)+ABS(v1215BEP)+ABS(v1311BPR)+ABS(vProvisionsueberschuss)+ABS(vsonstiger_Zinsueberschuss)<>0);
+
+# Ausführen SQL
+     ODBCOutput( 'co1', vSQL);
+  endif;
+ end;
+end;
+
+#endregion
+#region Epilog
+
+ODBCClose( 'co1' );  
+#endregion

@@ -1,0 +1,194 @@
+#region Prolog
+
+ODBCOpen( 'co1','f_prod_data','access_prod' );
+ODBCOutput( 'co1','delete from out_br_eur where monatsscheibe=(select monatsscheibe from pv_parameter)' );
+ODBCOutput( 'co1','delete from out_br_mrg where monatsscheibe=(select monatsscheibe from pv_parameter)' );
+
+
+SubsetCreatebyMDX( 'sVertrieb', '{FILTER(TM1SubsetAll([Vertrieb].[Vertrieb]), (LEFT([Vertrieb].[Vertrieb].CURRENTMEMBER.PROPERTIES("MEMBER_NAME"), 2) = "V_") OR ([Vertrieb].[Vertrieb].CURRENTMEMBER.PROPERTIES("MEMBER_NAME") = "A_NA"))}', 1 );
+SubsetCreatebyMDX( 'sProdukte', 'EXCEPT(TM1FILTERBYLEVEL(TM1SUBSETALL([Produkte].[Produkte]) , 0) , DESCENDANTS({[P_NVR]}))',1);
+SubsetCreatebyMDX( 'sZeit', '{FILTER( {TM1SUBSETALL( [Zeit] )}, Instr([Zeit].[Flag_Aktueller_Monat], "Kalkulation") > 0 )}', 1 );
+
+vZeit=SubsetGetElementName( 'Zeit', 'sZeit',1 );
+
+# Ermittlung Anzahl der Elemente in den Subsets
+vAnzahlSubsetVertrieb=SubsetGetSize( 'Vertrieb','sVertrieb' );
+vAnzahlSubsetProdukte=SubsetGetSize( 'Produkte', 'sProdukte' );
+
+iZählerVertrieb=0;
+
+# Loop über Anzahl Vertriebselemente im Subset
+while (iZählerVertrieb<vAnzahlSubsetVertrieb); 
+    iZählerVertrieb=iZählerVertrieb+1;
+    iZählerProdukte=0;
+
+    # Loop über Anzahl Produktelemente im Subset    
+    while (iZählerProdukte<vAnzahlSubsetProdukte)   ;
+
+        iZählerProdukte=iZählerProdukte+1;
+
+        # Ermittlung der Elementnamen in den Subsets     
+        vVertrieb=SubsetGetElementName( 'Vertrieb', 'sVertrieb',iZählerVertrieb );
+        vProdukte=SubsetGetElementName( 'Produkte', 'sProdukte', iZählerProdukte );
+
+        # Check, ob Datensatz gefülllt
+        vDeckungsbeitrag_III=CellGetN( 'BER', vVertrieb, vProdukte,vZeit,'Ist_EUR', 'Entwicklung', 'Deckungsbeitrag_III' );    
+        vRisikovorsorge_Kreditgeschaeft=CellGetN( 'BER', vVertrieb, vProdukte,vZeit,'Ist_EUR', 'Entwicklung', 'Risikovorsorge_Kreditgeschaeft' );
+        vverdiente_Risikokosten=CellGetN( 'BER', vVertrieb, vProdukte,vZeit,'Ist_EUR', 'Entwicklung', 'verdiente_Risikokosten' );
+        vEK_Kosten_KUKA=CellGetN( 'BER', vVertrieb, vProdukte,vZeit,'Ist_EUR', 'Entwicklung', 'EK_Kosten_KUKA' );
+        vDurch_Vol_Zinstr_Geschaeft=CellGetN( 'BER', vVertrieb, vProdukte,vZeit,'Ist_EUR', 'Entwicklung', 'durchschn_Volumen_zinstragendes_Geschaeft_(Mio._EUR)' );
+        vStichtagskredvol_per_dato=CellGetN( 'BER', vVertrieb, vProdukte,vZeit,'Ist_EUR', 'Entwicklung', 'Stichtagskreditvolumen_per_dato' );  
+        vStichtagskredvol_per_GJ_Anfang=CellGetN( 'BER', vVertrieb, vProdukte,vZeit,'Ist_EUR', 'Entwicklung', 'Stichtagskreditvolumen_per_GJ_Anfang' ); 
+        vNeugeschaeft=CellGetN( 'BER', vVertrieb, vProdukte,vZeit,'Ist_EUR', 'Entwicklung', 'Neugeschaeft' );
+        vDurchschn_RWA_per_dato_IRB=CellGetN( 'BER', vVertrieb, vProdukte,vZeit,'Ist_EUR', 'Entwicklung', 'Durchschn_Risikoaktiva_per_dato' );
+
+        
+        if (ABS(vDeckungsbeitrag_III)+ABS(vRisikovorsorge_Kreditgeschaeft)+ABS(vverdiente_Risikokosten)+ABS(vEK_Kosten_KUKA)+ABS(vDurch_Vol_Zinstr_Geschaeft)+ABS(vStichtagskredvol_per_dato)+ABS(vStichtagskredvol_per_GJ_Anfang)+ABS(vNeugeschaeft)+ABS(vDurchschn_RWA_per_dato_IRB)<>0);
+
+
+            # Auslesen der restlichen absoluten Werte 
+            vZinsueberschuss=CellGetN( 'BER', vVertrieb, vProdukte,vZeit,'Ist_EUR', 'Entwicklung', 'Zinsueberschuss' );
+            vZinsueberschuss_Foerder=CellGetN( 'BER', vVertrieb, vProdukte,vZeit,'Ist_EUR', 'Entwicklung', 'Zinsueberschuss_Foerdermittel' );
+            vZinsueberschuss_Eigen=CellGetN( 'BER', vVertrieb, vProdukte,vZeit,'Ist_EUR', 'Entwicklung', 'Zinsueberschuss_Eigenmittel' );
+            vZinsueberschuss_Funding=CellGetN( 'BER', vVertrieb, vProdukte,vZeit,'Ist_EUR', 'Entwicklung', 'Zinsmarge_mit_aktuellen_Fundingkosten' );
+            vPRV_UEBERSCHUSS_SONST_ZUE=CellGetN( 'BER', vVertrieb, vProdukte,vZeit,'Ist_EUR', 'Entwicklung', 'Provisionsueberschuss_SONST_ZUE' ); 
+            vFinanzanlageergebnis=CellGetN( 'BER', vVertrieb, vProdukte,vZeit,'Ist_EUR', 'Entwicklung', 'Finanzanlageergebnis_Sonst_betriebl_Erg' ); 
+            vBruttoergebnis=CellGetN( 'BER', vVertrieb, vProdukte,vZeit,'Ist_EUR', 'Entwicklung', 'Bruttoergebnis' );
+            vStandardrisikokosten=CellGetN( 'BER', vVertrieb, vProdukte,vZeit,'Ist_EUR', 'Entwicklung', 'Standardrisikokosten' );
+            vPlan_APL_Tilgungen=CellGetN( 'BER', vVertrieb, vProdukte,vZeit,'Ist_EUR', 'Entwicklung', 'plan_ausserplanmaessige_Tilgungen' );
+            vStichtags_RWA_per_dato_IRB=CellGetN( 'BER', vVertrieb, vProdukte,vZeit,'Ist_EUR', 'Entwicklung', 'Stichtagsrisikoaktiva_per_dato' );
+            vStichtags_RWA_per_dato_KSA=CellGetN( 'BER', vVertrieb, vProdukte,vZeit,'Ist_EUR', 'Entwicklung', 'Stichtagsrisikoaktiva_per_dato_KSA' );
+            vDurchschn_RWA_per_dato_IRB=CellGetN( 'BER', vVertrieb, vProdukte,vZeit,'Ist_EUR', 'Entwicklung', 'Durchschn_Risikoaktiva_per_dato' );
+            vDurchschn_RWA_per_dato_KSA=CellGetN( 'BER', vVertrieb, vProdukte,vZeit,'Ist_EUR', 'Entwicklung', 'Durchschn_Risikoaktiva_per_dato_KSA' );
+            vEigenkapital=CellGetN( 'BER', vVertrieb, vProdukte,vZeit,'Ist_EUR', 'Entwicklung', 'Eigenkapital' );
+            vPRV_Ueberschuss_Segmentbericht=CellGetN( 'BER', vVertrieb, vProdukte,vZeit,'Ist_EUR', 'Entwicklung', 'Provisionsueberschuss' );
+            vSonst_ZUE_Segmentbericht=CellGetN( 'BER', vVertrieb, vProdukte,vZeit,'Ist_EUR', 'Entwicklung', 'sonstiger_Zinsueberschuss' );
+            vProduktzugehoerigkeit=CellGetN( 'BER', vVertrieb, vProdukte,vZeit,'Ist_EUR', 'Entwicklung', 'Produktzugehörigkeit' );
+            vDeckungsbeitrag_I=CellGetN( 'BER', vVertrieb, vProdukte,vZeit,'Ist_EUR', 'Entwicklung', 'Deckungsbeitrag_I' );
+            vDeckungsbeitrag_III_RISIKO=CellGetN( 'BER', vVertrieb, vProdukte,vZeit,'Ist_EUR', 'Entwicklung', 'Deckungsbeitrag_III_Risikovorsorge' );
+            vDeckungsbeitrag_III_FUNDING=CellGetN( 'BER', vVertrieb, vProdukte,vZeit,'Ist_EUR', 'Entwicklung', 'Deckungsbeitrag_III_mit_aktuellen_Fundingkosten' );
+            vDeckungsbeitrag_IV=CellGetN( 'BER', vVertrieb, vProdukte,vZeit,'Ist_EUR', 'Entwicklung', 'Deckungsbeitrag_IV' );
+            vRestauszahlungsbetrag=CellGetN( 'BER', vVertrieb, vProdukte,vZeit,'Ist_EUR', 'Entwicklung', 'Restauszahlungsvolumen' );
+            vPV_ZINSAUFW_BONI_18_19=CellGetN( 'BER', vVertrieb, vProdukte,vZeit,'Ist_EUR', 'Entwicklung', 'PV_ZINSAUFW_BONI_18_19' );
+            vPV_ZINSERTR_BONI_18_19=CellGetN( 'BER', vVertrieb, vProdukte,vZeit,'Ist_EUR', 'Entwicklung', 'PV_ZINSERTR_BONI_18_19' );
+            vPV_ZINSERTRE_VERZ=CellGetN( 'BER', vVertrieb, vProdukte,vZeit,'Ist_EUR', 'Entwicklung', 'PV_ZINSERTR_VERZ' );
+            vPV_ZINSAUFW_SALDO_LFD=CellGetN( 'BER', vVertrieb, vProdukte,vZeit,'Ist_EUR', 'Entwicklung', 'PV_ZINSAUFW_SALDO_LFD' );
+            vPV_ZINSERTR_SALDO_LFD=CellGetN( 'BER', vVertrieb, vProdukte,vZeit,'Ist_EUR', 'Entwicklung', 'PV_ZINSERTR_SALDO_LFD' );
+            vZinsueberschuss_Kundenmarge=CellGetN( 'BER', vVertrieb, vProdukte,vZeit,'Ist_EUR', 'Entwicklung', 'Zinsuberschuss_Kundenmarge' );
+            vVWK_Markt=CellGetN( 'BER', vVertrieb, vProdukte,vZeit,'Ist_EUR', 'Entwicklung', 'Verwaltungskosten_Markt' );
+            vVWK_Marktfolge=CellGetN( 'BER', vVertrieb, vProdukte,vZeit,'Ist_EUR', 'Entwicklung', 'Verwaltungskosten_Marktfolge' );
+            vVWK_Zentrale=CellGetN( 'BER', vVertrieb, vProdukte,vZeit,'Ist_EUR', 'Entwicklung', 'Verwaltungskosten_Zentrale_Bereiche' );
+            vVWK_Zentrale_Umlage=CellGetN( 'BER', vVertrieb, vProdukte,vZeit,'Ist_EUR', 'Entwicklung', 'Verwaltungskosten_Zentrale_Umlage' );
+
+
+            # Auslesen der Margen
+            vZinsueberschuss_MRG=CellGetN( 'BER', vVertrieb, vProdukte,vZeit,'Ist_Marge', 'Entwicklung', 'Zinsueberschuss' );
+            vZinsueberschuss_Funding_MRG=CellGetN( 'BER', vVertrieb, vProdukte,vZeit,'Ist_Marge', 'Entwicklung', 'Zinsmarge_mit_aktuellen_Fundingkosten' ); 
+            vPRV_UEBERSCHUSS_SONST_ZUE_MRG=CellGetN( 'BER', vVertrieb, vProdukte,vZeit,'Ist_Marge', 'Entwicklung', 'Provisionsueberschuss_SONST_ZUE' ); 
+            vFinanzanlageergebnis_MRG=CellGetN( 'BER', vVertrieb, vProdukte,vZeit,'Ist_Marge', 'Entwicklung', 'Finanzanlageergebnis_Sonst_betriebl_Erg' ); 
+            vBruttoergebnis_MRG=CellGetN( 'BER', vVertrieb, vProdukte,vZeit,'Ist_Marge', 'Entwicklung', 'Bruttoergebnis' );
+            vStandardrisikokosten_MRG=CellGetN( 'BER', vVertrieb, vProdukte,vZeit,'Ist_Marge', 'Entwicklung', 'Standardrisikokosten' );
+            vRisikovorsorge_Kreditgeschaeft_MRG=CellGetN( 'BER', vVertrieb, vProdukte,vZeit,'Ist_Marge', 'Entwicklung', 'Risikovorsorge_Kreditgeschaeft');
+            vverdiente_Risikokosten_MRG=CellGetN( 'BER', vVertrieb, vProdukte,vZeit,'Ist_Marge', 'Entwicklung', 'verdiente_Risikokosten' );
+            vEK_Kosten_KUKA_MRG=CellGetN( 'BER', vVertrieb, vProdukte,vZeit,'Ist_Marge', 'Entwicklung', 'EK_Kosten_KUKA' );  
+            vDeckungsbeitrag_I_MRG=CellGetN( 'BER', vVertrieb, vProdukte,vZeit,'Ist_Marge', 'Entwicklung', 'Deckungsbeitrag_I' );
+            vDeckungsbeitrag_IV_MRG=CellGetN( 'BER', vVertrieb, vProdukte,vZeit,'Ist_Marge', 'Entwicklung', 'Deckungsbeitrag_IV' );
+            vDeckungsbeitrag_III_MRG=CellGetN( 'BER', vVertrieb, vProdukte,vZeit,'Ist_Marge', 'Entwicklung', 'Deckungsbeitrag_III' );
+            vDeckungsbeitrag_III_Risiko_MRG=CellGetN( 'BER', vVertrieb, vProdukte,vZeit,'Ist_Marge', 'Entwicklung', 'Deckungsbeitrag_III_Risikovorsorge' );
+            vZinsueberschuss_Kundenmarge_MRG=CellGetN( 'BER', vVertrieb, vProdukte,vZeit,'Ist_Marge', 'Entwicklung', 'Zinsuberschuss_Kundenmarge' );
+            vVWK_Markt_MRG=CellGetN( 'BER', vVertrieb, vProdukte,vZeit,'Ist_Marge', 'Entwicklung', 'Verwaltungskosten_Markt' );
+            vVWK_Marktfolge_MRG=CellGetN( 'BER', vVertrieb, vProdukte,vZeit,'Ist_Marge', 'Entwicklung', 'Verwaltungskosten_Marktfolge' );
+            vVWK_Zentrale_MRG=CellGetN( 'BER', vVertrieb, vProdukte,vZeit,'Ist_Marge', 'Entwicklung', 'Verwaltungskosten_Zentrale_Bereiche' );
+            vVWK_Zentrale_Umlage_MRG=CellGetN( 'BER', vVertrieb, vProdukte,vZeit,'Ist_Marge', 'Entwicklung', 'Verwaltungskosten_Zentrale_Umlage' );
+            
+
+            # Umwandlung Produktzugehörigkeit
+            vZinsueberschuss_String=NumberToStringEx(vZinsueberschuss,'#.0,###########','.','');
+            vZinsueberschuss_MRG_String=NumberToStringEx(vZinsueberschuss_MRG,'#.0,###########','.','');
+            vZinsueberschuss_Foerder_String=NumberToStringEx(vZinsueberschuss_Foerder,'#.0,###########','.','');
+            vZinsueberschuss_Eigen_String=NumberToStringEx(vZinsueberschuss_Eigen,'#.0,###########','.','');
+            vZinsueberschuss_Funding_String=NumberToStringEx(vZinsueberschuss_Funding,'#.0,###########','.','');
+            vZinsueberschuss_Funding_MRG_String=NumberToStringEx(vZinsueberschuss_Funding_MRG,'#.0,###########','.','');
+            vPRV_UEBERSCHUSS_SONST_ZUE_String=NumberToStringEx(vPRV_UEBERSCHUSS_SONST_ZUE,'#.0,###########','.','');
+            vPRV_UEBERSCHUSS_SONST_ZUE_MRG_String=NumberToStringEx(vPRV_UEBERSCHUSS_SONST_ZUE_MRG,'#.0,###########','.','');
+            vFinanzanlageergebnis_String=NumberToStringEx(vFinanzanlageergebnis,'#.0,###########','.','');
+            vFinanzanalgeergebnis_MRG_String=NumberToStringEx(vFinanzanlageergebnis_MRG,'#.0,###########','.','');
+            vBruttoergebnis_String=NumberToStringEx(vBruttoergebnis,'#.0,###########','.','');
+            vBruttoergebnis_MRG_String=NumberToStringEx(vBruttoergebnis_MRG,'#.0,###########','.','');
+            vStandardrisikokosten_String=NumberToStringEx(vStandardrisikokosten,'#.0,###########','.','');
+            vStandardrisikokosten_MRG_String=NumberToStringEx(vStandardrisikokosten_MRG,'#.0,###########','.','');
+            vRisikovorsorge_Kreditgeschaeft_String=NumberToStringEx(vRisikovorsorge_Kreditgeschaeft,'#.0,###########','.','');
+            vRisikovorsorge_Kreditgeschaeft_MRG_String=NumberToStringEx(vRisikovorsorge_Kreditgeschaeft_MRG,'#.0,###########','.','');
+            vverdiente_Risikokosten_String=NumberToStringEx(vverdiente_Risikokosten,'#.0,###########','.','');
+            vverdiente_Risikokosten_MRG_String=NumberToStringEx(vverdiente_Risikokosten_MRG,'#.0,###########','.','');
+            vEK_Kosten_KUKA_String=NumberToStringEx(vEK_Kosten_KUKA,'#.0,###########','.','');
+            vEK_Kosten_KUKA_MRG_String=NumberToStringEx(vEK_Kosten_KUKA_MRG,'#.0,###########','.','');
+            vDurch_Vol_Zinstr_Geschaeft_String=NumberToStringEx(vDurch_Vol_Zinstr_Geschaeft,'#.0,###########','.','');
+            vStichtagskredvol_per_GJ_Anfang_String=NumberToStringEx(vStichtagskredvol_per_GJ_Anfang,'#.0,###########','.','');
+            vStichtagskredvol_per_dato_String=NumberToStringEx(vStichtagskredvol_per_dato,'#.0,###########','.','');
+            vNeugeschaeft_String=NumberToStringEx(vNeugeschaeft,'#.0,###########','.','');
+            vPlan_APL_Tilgungen_String=NumberToStringEx(vPlan_APL_Tilgungen,'#.0,###########','.','');
+            vStichtags_RWA_per_dato_IRB_String=NumberToStringEx(vStichtags_RWA_per_dato_IRB,'#.0,###########','.','');
+            vStichtags_RWA_per_dato_KSA_String=NumberToStringEx(vStichtags_RWA_per_dato_KSA,'#.0,###########','.','');
+            vDurchschn_RWA_per_dato_IRB_String=NumberToStringEx(vDurchschn_RWA_per_dato_IRB,'#.0,###########','.','');
+            vDurchschn_RWA_per_dato_KSA_String=NumberToStringEx(vDurchschn_RWA_per_dato_KSA,'#.0,###########','.','');
+            vEigenkapital_String=NumberToStringEx(vEigenkapital,'#.0,###########','.','');
+            vPRV_Ueberschuss_Segmentbericht_String=NumberToStringEx(vPRV_Ueberschuss_Segmentbericht,'#.0,###########','.','');
+            vSonst_ZUE_Segmentbericht_String=NumberToStringEx(vSonst_ZUE_Segmentbericht,'#.0,###########','.','');
+            vDeckungsbeitrag_I_MRG_String=NumberToStringEx(vDeckungsbeitrag_I_MRG,'#.0,###########','.','');
+            vDeckungsbeitrag_IV_MRG_String=NumberToStringEx(vDeckungsbeitrag_IV_MRG,'#.0,###########','.','');            
+            vDeckungsbeitrag_III_MRG_String=NumberToStringEx(vDeckungsbeitrag_III_MRG,'#.0,###########','.','');
+            vDeckungsbeitrag_III_RISIKO_String=NumberToStringEx(vDeckungsbeitrag_III_RISIKO,'#.0,###########','.','');            
+            vDeckungsbeitrag_III_Risiko_MRG_String=NumberToStringEx(vDeckungsbeitrag_III_Risiko_MRG,'#.0,###########','.','');
+            vDeckungsbeitrag_I_String=NumberToStringEx(vDeckungsbeitrag_I,'#.0,###########','.','');
+            vDeckungsbeitrag_IV_String=NumberToStringEx(vDeckungsbeitrag_IV,'#.0,###########','.','');            
+            vDeckungsbeitrag_III_String=NumberToStringEx(vDeckungsbeitrag_III,'#.0,###########','.','');
+            vDeckungsbeitrag_III_FUNDING_String=NumberToStringEx(vDeckungsbeitrag_III_FUNDING,'#.0,###########','.','');
+            vRestauszahlungsbetrag_String=NumberToStringEx(vRestauszahlungsbetrag,'#.0,###########','.','');
+            vPV_ZINSAUFW_BONI_18_19_String=NumberToStringEx(vPV_ZINSAUFW_BONI_18_19,'#.0,###########','.','');
+            vPV_ZINSERTR_BONI_18_19_String=NumberToStringEx(vPV_ZINSERTR_BONI_18_19,'#.0,###########','.','');
+            vPV_ZINSERTRE_VERZ_String=NumberToStringEx(vPV_ZINSERTRE_VERZ,'#.0,###########','.','');
+            vZinsueberschuss_Kundenmarge_MRG_String=NumberToStringEx(vZinsueberschuss_Kundenmarge_MRG,'#.0,###########','.','');
+            vPV_ZINSAUFW_SALDO_LFD_String=NumberToStringEx(vPV_ZINSAUFW_SALDO_LFD,'#.0,###########','.','');
+            vPV_ZINSERTR_SALDO_LFD_String=NumberToStringEx(vPV_ZINSERTR_SALDO_LFD,'#.0,###########','.','');
+            vZinsueberschuss_Kundenmarge_String=NumberToStringEx(vZinsueberschuss_Kundenmarge,'#.0,###########','.','');
+            vVWK_Markt_MRG_String=NumberToStringEx(vVWK_Markt_MRG,'#.0,###########','.','');
+            vVWK_Marktfolge_MRG_String=NumberToStringEx(vVWK_Marktfolge_MRG,'#.0,###########','.','');
+            vVWK_Zentrale_MRG_String=NumberToStringEx(vVWK_Zentrale_MRG,'#.0,###########','.','');
+            vVWK_Zentrale_Umlage_MRG_String=NumberToStringEx(vVWK_Zentrale_Umlage_MRG,'#.0,###########','.','');
+            vVWK_Markt_String=NumberToStringEx(vVWK_Markt,'#.0,###########','.','');
+            vVWK_Marktfolge_String=NumberToStringEx(vVWK_Marktfolge,'#.0,###########','.','');
+            vVWK_Zentrale_String=NumberToStringEx(vVWK_Zentrale,'#.0,###########','.','');
+            vVWK_Zentrale_Umlage_String=NumberToStringEx(vVWK_Zentrale_Umlage,'#.0,###########','.','');
+
+
+            # Aufbau SQL String für OUT_BR_EUR
+            vSQLABS1='insert into out_br_eur values ('''|vVertrieb|''','''|vZeit|''','''|vProdukte|''','|vZinsueberschuss_String|','|vZinsueberschuss_Foerder_String|','|vZinsueberschuss_Eigen_String|','|vZinsueberschuss_Funding_String|',';
+            vSQLABS2=vPRV_UEBERSCHUSS_SONST_ZUE_String|',NULL,'|vFinanzanlageergebnis_String|','|vBruttoergebnis_String|','|vStandardrisikokosten_String|','|vRisikovorsorge_Kreditgeschaeft_String|',';
+            vSQLABS3=vverdiente_Risikokosten_String|','|vEK_Kosten_KUKA_String|','|vDurch_Vol_Zinstr_Geschaeft_String|','|vStichtagskredvol_per_dato_String|','|vStichtagskredvol_per_GJ_Anfang_String|',';
+            vSQLABS4=vNeugeschaeft_String|','|vPlan_APL_Tilgungen_String|','|vStichtags_RWA_per_dato_IRB_String|','|vStichtags_RWA_per_dato_KSA_String|','|vDurchschn_RWA_per_dato_IRB_String|',';
+            vSQLABS5=vDurchschn_RWA_per_dato_KSA_String|','|vEigenkapital_String|','|vPRV_Ueberschuss_Segmentbericht_String|','|vSonst_ZUE_Segmentbericht_String|','|vDeckungsbeitrag_I_String|',';
+            vSQLABS6=vDeckungsbeitrag_III_String|','|vDeckungsbeitrag_III_RISIKO_String|','|vDeckungsbeitrag_III_FUNDING_String|','|vDeckungsbeitrag_IV_String|',';
+            vSQLABS7=vRestauszahlungsbetrag_String|','|vZinsueberschuss_Kundenmarge_String|','|vVWK_Markt_String|','|vVWK_Marktfolge_String|','|vVWK_Zentrale_String|','|vVWK_Zentrale_Umlage_String|',sysdate)';
+            vSQLABS_Gesamt=vSQLABS1|vSQLABS2|vSQLABS3|vSQLABS4|vSQLABS5|vSQLABS6|vSQLABS7;
+
+
+            # Aufbau SQL String für OUT_BR_MRG
+            vSQLMRG1='insert into out_BR_MRG values ('''|vVertrieb|''','''|vZeit|''','''|vProdukte|''','|vZinsueberschuss_MRG_String|','|vPRV_UEBERSCHUSS_SONST_ZUE_MRG_String|',NULL,'|vFinanzanalgeergebnis_MRG_String|',';
+            vSQLMRG2=vBruttoergebnis_MRG_String|','|vStandardrisikokosten_MRG_String|','|vRisikovorsorge_Kreditgeschaeft_MRG_String|','|vverdiente_Risikokosten_MRG_String|','|vEK_Kosten_KUKA_MRG_String|',';
+            vSQLMRG3=vDeckungsbeitrag_I_MRG_String|','|vDeckungsbeitrag_III_MRG_String|','|vDeckungsbeitrag_III_Risiko_MRG_String|','|vDeckungsbeitrag_IV_MRG_String|','|vZinsueberschuss_Funding_MRG_String|',';
+            vSQLMRG4=vZinsueberschuss_Kundenmarge_MRG_String|','|vVWK_Markt_MRG_String|','|vVWK_Marktfolge_MRG_String|','|vVWK_Zentrale_MRG_String|','|vVWK_Zentrale_Umlage_MRG_String|',sysdate)';
+            vSQLMRG_Gesamt=vSQLMRG1|vSQLMRG2|vSQLMRG3|vSQLMRG4;
+
+            # Ausführen SQL
+            #ASCIIOutput( './output/Einzelliste_ABS', vSQLABS_Gesamt ); 
+            ODBCOutput( 'co1',vSQLABS_Gesamt );
+            ODBCOutput( 'co1',vSQLMRG_Gesamt ); 
+             
+        endif;
+    end;
+end;     
+#endregion
+#region Epilog
+ODBCClose( 'co1' );
+#endregion

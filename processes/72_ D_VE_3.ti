@@ -1,0 +1,38 @@
+#region Prolog
+
+
+
+
+
+#endregion
+#region Data
+
+
+CellIncrementN( vNGVOL , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'Neugeschaeft');
+
+CellPutS( vBONITAET , 'BER' , vVERTRIEB ,vPRODUKTE, vZeit ,vVERSION, vFREIGABE,'Bonitaet');
+
+
+
+
+###### Textwerte als Attribute hinzufügen #########
+if (ATTRS('Vertrieb', ElementParent( 'Vertrieb', 'Vertrieb', vVERTRIEB, 1 ),'Typ')@='Vertragsstamm');
+  vVertrieb_Level_VS=ElementParent( 'Vertrieb', 'Vertrieb', vVERTRIEB, 1 );
+endif;
+if (ATTRS('Vertrieb', ElementParent( 'Vertrieb', 'Vertrieb', vVertrieb_Level_VS, 1 ),'Typ')@='Kunde');
+  vVertrieb_Level_KD=ElementParent( 'Vertrieb', 'Vertrieb', vVertrieb_Level_VS, 1 );
+Endif;
+
+if (ATTRS('Vertrieb', vVERTRIEB,'VVS')@='');
+  AttrPutS( vVVS, 'Vertrieb', vVertrieb, 'VVS', '' );
+endif;
+if (ATTRS('Vertrieb', ElementParent( 'Vertrieb', 'Vertrieb', vVERTRIEB, 1 ),'VVS')@='');
+  AttrPutS( vVVS, 'Vertrieb',vVertrieb_Level_VS,'VVS', '' );
+endif;
+if (ATTRS('Vertrieb', ElementParent( 'Vertrieb', 'Vertrieb', vVertrieb_Level_VS, 1 ),'VVS')@='');
+  AttrPutS( vVVS, 'Vertrieb',vVertrieb_Level_KD,'VVS', '' );
+endif;
+
+
+
+#endregion
